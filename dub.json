@@ -5,5 +5,20 @@
 	],
 	"description": "A stemmer library for D programming language",
 	"copyright": "Copyright © 2018, Bogdan Szabo",
-	"license": "MIT"
+	"license": "MIT",
+	"configurations": [
+		{
+			"name": "library",
+			"targetType": "library"
+		},
+		{
+			"name": "trial",
+			"dependencies": {
+				"fluent-asserts": "~>0.9.0",
+				"trial:lifecycle": "~>0.6.1"
+			},
+			"sourcePaths": ["./source", "./tests"],
+			"importPaths": ["./source"]
+		}
+	]
 }

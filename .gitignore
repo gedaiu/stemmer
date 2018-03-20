@@ -12,3 +12,6 @@ stemmer-test-*
 *.o
 *.obj
 *.lst
+coverage/
+trial-root
+trial_root.d

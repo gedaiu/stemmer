@@ -1,0 +1,17 @@
+{
+	"reporters": [
+		"spec",
+		"result"
+	],
+	"executor": "default",
+	"plugins": [],
+	"artifactsLocation": ".trial",
+	"runInParallel": false,
+	"maxThreads": 0,
+	"dangerTestDuration": 100,
+	"warningTestDuration": 20,
+	"testDiscovery": [
+		"trial.discovery.unit.UnitTestDiscovery",
+		"trial.discovery.spec.SpecTestDiscovery"
+	]
+}
