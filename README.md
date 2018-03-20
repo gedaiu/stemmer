@@ -1,4 +1,6 @@
-# Stemmer
+# Stemmer [![Build Status](https://travis-ci.org/gedaiu/stemmer.svg?branch=master)](https://travis-ci.org/gedaiu/stemmer)
+
+
 A stemmer library for D programming language. It implements the Porter Stemming Algorithm and it's tested against the 
 [Snowball](http://snowball.tartarus.org/algorithms/porter/stemmer.html) examples.
 
