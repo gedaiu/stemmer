@@ -9,10 +9,6 @@ fi
 # test for successful release build
 dub build -b release --compiler=$DC
 
-# run unit tests
-# dub test :runner --compiler=$DC
-dub run :runner --compiler=$DC -- :lifecycle --coverage -v
-
 # install trial
 dub fetch -v trial --version 0.6.2 --cache=local
 dub build :runner --root ./trial-0.6.2/trial/ -v
