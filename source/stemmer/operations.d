@@ -5,10 +5,14 @@ import std.conv;
 import std.algorithm;
 import std.array;
 
+/// Define a stemming operation
 immutable interface IStemOperation {
+
+  /// Aplly the operation and returns the result
   string get(const string value) pure;
 }
 
+///
 immutable class Invariant : IStemOperation {
   immutable(string[]) list;
 
@@ -29,6 +33,7 @@ immutable class Invariant : IStemOperation {
   }
 }
 
+///
 immutable class ReplaceWord : IStemOperation {
 
   immutable(string[2][]) list;
@@ -53,6 +58,7 @@ immutable class ReplaceWord : IStemOperation {
   }
 }
 
+///
 immutable class ReplaceAfter : IStemOperation {
   immutable(string[2][]) list;
 
@@ -77,6 +83,7 @@ immutable class ReplaceAfter : IStemOperation {
   }
 }
 
+///
 immutable class ReplacePostfix : IStemOperation {
   immutable(string[2][]) list;
   immutable size_t minLength;
@@ -106,6 +113,7 @@ immutable class ReplacePostfix : IStemOperation {
   }
 }
 
+///
 immutable class InlineReplace : IStemOperation {
 
   immutable(string[2][]) list;
@@ -141,6 +149,7 @@ immutable class InlineReplace : IStemOperation {
   }
 }
 
+///
 immutable class RemovePostfix : IStemOperation {
   immutable(string[]) list;
 
@@ -163,6 +172,7 @@ immutable class RemovePostfix : IStemOperation {
   }
 }
 
+///
 immutable class And : IStemOperation {
   immutable(IStemOperation[]) list;
 
@@ -191,6 +201,7 @@ immutable class And : IStemOperation {
   }
 }
 
+///
 immutable class Or : IStemOperation {
   immutable(IStemOperation[][]) list;
 
@@ -219,6 +230,7 @@ immutable class Or : IStemOperation {
   }
 }
 
+///
 immutable abstract class StemOperationFromRegion(T) : IStemOperation {
   immutable {
     size_t region;
@@ -245,6 +257,7 @@ immutable abstract class StemOperationFromRegion(T) : IStemOperation {
   }
 }
 
+///
 immutable class RemovePostifixFromRegion(T) : StemOperationFromRegion!T {
   string[] list;
 
@@ -279,6 +292,7 @@ immutable class RemovePostifixFromRegion(T) : StemOperationFromRegion!T {
   }
 }
 
+///
 immutable class ReplacePostifixFromRegion(T) : StemOperationFromRegion!T {
   immutable {
     string[][] list;
@@ -315,6 +329,7 @@ immutable class ReplacePostifixFromRegion(T) : StemOperationFromRegion!T {
   }
 }
 
+///
 immutable class ReplaceFromRegion(T) : StemOperationFromRegion!T {
   immutable {
     string[][] list;
@@ -347,6 +362,7 @@ immutable class ReplaceFromRegion(T) : StemOperationFromRegion!T {
   }
 }
 
+///
 immutable class ReplaceAfterFromRegion(T) : StemOperationFromRegion!T {
   immutable(string[2][]) list;
 

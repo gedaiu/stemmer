@@ -6,14 +6,17 @@ import std.array;
 import std.conv;
 import std.algorithm;
 
+/// Check if the char can be properly handled by a stemmer
 bool isClean(const dchar ch) pure {
   return ch.isAlphaNum;
 }
 
+/// Check if a sequence of two letters are between a number and a character
 bool isBetweenNumberAndText(dchar a, dchar b) pure {
   return (a.isAlpha && b.isNumber) || (b.isAlpha && a.isNumber);
 }
 
+/// Removes special chars and prepares the text for stemming
 string clean(string data) pure {
   enum dchar space = ' ';
 

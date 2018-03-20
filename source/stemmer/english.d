@@ -10,11 +10,25 @@ import valley.stemmer.stemmer;
 
 alias EnglishAlphabet = Alphabet!(["a", "e", "i", "o", "u", "y"], [ "Y" ]);
 
+/**
+  Search for the longest among the following suffixes, and perform the action indicated.
+
+  eed   eedly+
+      replace by ee if in R1
+
+  ed   edly+   ing   ingly+
+      delete if the preceding word part contains a vowel, and after the deletion: 
+      if the word ends at, bl or iz add e (so luxuriat -> luxuriate), or 
+      if the word ends with a double remove the last letter (so hopp -> hop), or 
+      if the word is short, add e (so hop -> hope) 
+*/
 immutable class EnglishRule1b : IStemOperation {
+  /// Instantiate the rule
   static immutable(IStemOperation) opCall() pure {
     return new immutable EnglishRule1b();
   }
 
+  /// Apply the rule to a word
   string get(const string value) pure {
     if(value.endsWith("eed") || value.endsWith("eedly")) {
       auto r1 = EnglishAlphabet.region1(value);
@@ -74,11 +88,16 @@ immutable class EnglishRule1b : IStemOperation {
   }
 }
 
+/** 
+  Search for the longest among the following suffixes, and, if found and in R2, delete if preceded by s or t 
+*/
 immutable class EnglishIonPostfix : IStemOperation {
+  /// Instantiate the rule
   static immutable(IStemOperation) opCall() pure {
     return new immutable EnglishIonPostfix();
   }
 
+  /// Apply the rule to a word
   string get(const string value) pure {
     auto r2 = EnglishAlphabet.region2(value);
 
@@ -94,11 +113,19 @@ immutable class EnglishIonPostfix : IStemOperation {
   }
 }
 
+/**
+  Search for the the following suffixes, and, if found, perform the action indicated.
+    `e` delete if in R2, or in R1 and not preceded by a short syllable 
+    `l` delete if in R2 and preceded by l 
+*/
 immutable class EnglishRule5 : IStemOperation {
+
+  /// Instantiate the rule
   static immutable(IStemOperation) opCall() pure {
     return new immutable EnglishRule5();
   }
 
+  /// Apply the rule to a word
   string get(const string value) pure {
     auto r1 = EnglishAlphabet.region1(value);
     auto r2 = EnglishAlphabet.region1(r1);
@@ -123,11 +150,19 @@ immutable class EnglishRule5 : IStemOperation {
   }
 }
 
+/**
+  Define a valid li-ending as one of
+    c   d   e   g   h   k   m   n   r   t
+
+  Search for the longest among the following suffixes, and, if found and in R1, delete if preceded by a valid li-ending.
+*/
 immutable class ReplaceEnglishLiEnding : IStemOperation {
+  /// Instantiate the rule
   static immutable(IStemOperation) opCall() pure {
     return new immutable ReplaceEnglishLiEnding();
   }
 
+  /// Apply the rule to a word
   string get(const string value) pure {
     if(value.length <= 2) {
       return "";
@@ -157,11 +192,21 @@ immutable class ReplaceEnglishLiEnding : IStemOperation {
   }
 }
 
+/**
+  Search for the longest among the suffixes,
+
+  '
+  's
+  's'
+      and remove if found. 
+*/
 immutable class RemoveEnglishPlural : IStemOperation {
+  /// Instantiate the rule
   static immutable(IStemOperation) opCall() pure {
     return new immutable RemoveEnglishPlural();
   }
 
+  /// Apply the rule to a word
   string get(const string value) pure {
     if(value.length <= 2) {
       return "";
@@ -189,7 +234,10 @@ immutable class RemoveEnglishPlural : IStemOperation {
   }
 }
 
+/// English Porter2 stemmer implementation
 class EnStemmer {
+
+  /// The stemmer operations
   static immutable operations = [
     Or([
       [ Invariant(["sky", "news", "howe", "atlas", "cosmos", "bias", "andes"]) ], // exception 1 or
@@ -289,6 +337,7 @@ class EnStemmer {
     ])
   ];
 
+  /// Apply the algorithm to a word
   string get(const string value) pure {
     if(value.length < 3) {
       return value;

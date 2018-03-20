@@ -18,3 +18,11 @@ It contains only an english stemmer but support for other languages will be adde
   
   writeln(result);
 ```
+
+## Running the tests
+
+The tests are implemented using the [trial](http://trial.szabobogdan.com/) test runner. After installing it, you can just run the trial command:
+
+```d
+trial
+```

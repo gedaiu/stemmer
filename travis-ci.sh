@@ -18,4 +18,4 @@ dub fetch -v trial --version 0.6.2 --cache=local
 dub build :runner --root ./trial-0.6.2/trial/ -v
 
 # run the tests
-./trial-0.6.2/trial/trial
+./trial-0.6.2/trial/trial --coverage
