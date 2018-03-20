@@ -1,0 +1,9 @@
+{
+	"name": "stemmer",
+	"authors": [
+		"Bogdan Szabo"
+	],
+	"description": "A stemmer library for D programming language",
+	"copyright": "Copyright © 2018, Bogdan Szabo",
+	"license": "MIT"
+}
