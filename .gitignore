@@ -17,3 +17,4 @@ trial-root
 trial_root.d
 trial-*
 libstemmer.a
+.trial

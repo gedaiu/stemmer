@@ -1,9 +1,9 @@
-module tests.valley.stemmer.en;
+module tests.stemmer.en;
 
 import fluent.asserts;
 import trial.discovery.spec;
 
-import valley.stemmer.english;
+import stemmer.english;
 
 import std.file;
 import std.conv;
@@ -145,7 +145,8 @@ private alias suite = Spec!({
       ["eas", "ea"],
       ["fluently", "fluentli"],
       ["ied", "ie"],
-      ["kinkajou", "kinkajou"]
+      ["kinkajou", "kinkajou"],
+      ["zorillos", "zorillo"]
     ];
 
     static foreach(words; stems) {

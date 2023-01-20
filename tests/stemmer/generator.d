@@ -1,10 +1,10 @@
-module tests.valley.stemmer.generator.d;
+module tests.stemmer.generator.d;
 
 import fluent.asserts;
 import trial.discovery.spec;
 
-import valley.stemmer.english;
-import valley.stemmer.stemmer;
+import stemmer.english;
+import stemmer.stemmer;
 
 import std.file;
 import std.conv;

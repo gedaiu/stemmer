@@ -1,9 +1,9 @@
-module tests.valley.stemmer.cleaner;
+module tests.stemmer.cleaner;
 
 import fluent.asserts;
 import trial.discovery.spec;
 
-import valley.stemmer.cleaner;
+import stemmer.cleaner;
 
 import std.file;
 import std.conv;

@@ -1,12 +1,12 @@
-module valley.stemmer.english;
+module stemmer.english;
 
 import std.string;
 import std.conv;
 import std.algorithm;
 import std.array;
 
-import valley.stemmer.operations;
-import valley.stemmer.stemmer;
+import stemmer.operations;
+import stemmer.stemmer;
 
 alias EnglishAlphabet = Alphabet!(["a", "e", "i", "o", "u", "y"], [ "Y" ]);
 
@@ -17,137 +17,140 @@ alias EnglishAlphabet = Alphabet!(["a", "e", "i", "o", "u", "y"], [ "Y" ]);
       replace by ee if in R1
 
   ed   edly+   ing   ingly+
-      delete if the preceding word part contains a vowel, and after the deletion: 
-      if the word ends at, bl or iz add e (so luxuriat -> luxuriate), or 
-      if the word ends with a double remove the last letter (so hopp -> hop), or 
-      if the word is short, add e (so hop -> hope) 
+      delete if the preceding word part contains a vowel, and after the deletion:
+      if the word ends at, bl or iz add e (so luxuriat -> luxuriate), or
+      if the word ends with a double remove the last letter (so hopp -> hop), or
+      if the word is short, add e (so hop -> hope)
 */
-immutable class EnglishRule1b : IStemOperation {
-  /// Instantiate the rule
-  static immutable(IStemOperation) opCall() pure {
-    return new immutable EnglishRule1b();
-  }
+class EnglishRule1b : IStemOperation {
+  immutable:
+    /// Instantiate the rule
+    static immutable(IStemOperation) opCall() pure {
+      return new immutable EnglishRule1b();
+    }
 
-  /// Apply the rule to a word
-  string get(const string value) pure {
-    if(value.endsWith("eed") || value.endsWith("eedly")) {
-      auto r1 = EnglishAlphabet.region1(value);
+    /// Apply the rule to a word
+    string get(const string value) pure {
+      if(value.endsWith("eed") || value.endsWith("eedly")) {
+        auto r1 = EnglishAlphabet.region1(value);
 
-      if(r1.endsWith("eed")){
-        return value[0..$-1];
+        if(r1.endsWith("eed")){
+          return value[0..$-1];
+        }
+
+        if(r1.endsWith("eedli")){
+          return value[0..$-3];
+        }
+
+        return "";
       }
 
-      if(r1.endsWith("eedli")){
+      auto result = Or([
+        RemovePostfix([ "ed", "ing" ]),
+        ReplaceAfter([
+          ["edly", ""],
+          ["ingly", ""]
+        ])
+      ]).get(value);
+
+      if(result == "") {
+        return "";
+      }
+
+      if(!result.map!(a => EnglishAlphabet.isVowel(a)).canFind(true)) {
+        return "";
+      }
+
+      if(result.endsWith("at") || result.endsWith("bl") || result.endsWith("iz")) {
+        return result ~ "e";
+      }
+
+      auto replaceDouble = ReplacePostfix([
+        ["bb", "b"],
+        ["dd", "d"],
+        ["ff", "f"],
+        ["gg", "g"],
+        ["mm", "m"],
+        ["nn", "n"],
+        ["pp", "p"],
+        ["rr", "r"],
+        ["tt", "t"]
+      ]).get(result);
+
+      if(replaceDouble != "") {
+        return replaceDouble;
+      }
+
+      if(EnglishAlphabet.isShortWord(result)) {
+        result ~= "e";
+      }
+
+      return result;
+    }
+}
+
+/**
+  Search for the longest among the following suffixes, and, if found and in R2, delete if preceded by s or t
+*/
+class EnglishIonPostfix : IStemOperation {
+  immutable:
+    /// Instantiate the rule
+    static immutable(IStemOperation) opCall() pure {
+      return new immutable EnglishIonPostfix();
+    }
+
+    /// Apply the rule to a word
+    string get(const string value) pure {
+      auto r2 = EnglishAlphabet.region2(value);
+
+      if(!r2.endsWith("ion")) {
+        return "";
+      }
+
+      if(value.endsWith("tion") || value.endsWith("sion")) {
         return value[0..$-3];
       }
 
       return "";
     }
-
-    auto result = Or([
-      RemovePostfix([ "ed", "ing" ]),
-      ReplaceAfter([
-        ["edly", ""],
-        ["ingly", ""]
-      ])
-    ]).get(value);
-
-    if(result == "") {
-      return "";
-    }
-
-    if(!result.map!(a => EnglishAlphabet.isVowel(a)).canFind(true)) {
-      return "";
-    }
-
-    if(result.endsWith("at") || result.endsWith("bl") || result.endsWith("iz")) {
-      return result ~ "e";
-    }
-
-    auto replaceDouble = ReplacePostfix([
-      ["bb", "b"],
-      ["dd", "d"],
-      ["ff", "f"],
-      ["gg", "g"],
-      ["mm", "m"],
-      ["nn", "n"],
-      ["pp", "p"],
-      ["rr", "r"],
-      ["tt", "t"]
-    ]).get(result);
-
-    if(replaceDouble != "") {
-      return replaceDouble;
-    }
-
-    if(EnglishAlphabet.isShortWord(result)) {
-      result ~= "e";
-    }
-
-    return result;
-  }
-}
-
-/** 
-  Search for the longest among the following suffixes, and, if found and in R2, delete if preceded by s or t 
-*/
-immutable class EnglishIonPostfix : IStemOperation {
-  /// Instantiate the rule
-  static immutable(IStemOperation) opCall() pure {
-    return new immutable EnglishIonPostfix();
-  }
-
-  /// Apply the rule to a word
-  string get(const string value) pure {
-    auto r2 = EnglishAlphabet.region2(value);
-
-    if(!r2.endsWith("ion")) {
-      return "";
-    }
-
-    if(value.endsWith("tion") || value.endsWith("sion")) {
-      return value[0..$-3];
-    }
-
-    return "";
-  }
 }
 
 /**
   Search for the the following suffixes, and, if found, perform the action indicated.
-    `e` delete if in R2, or in R1 and not preceded by a short syllable 
-    `l` delete if in R2 and preceded by l 
+    `e` delete if in R2, or in R1 and not preceded by a short syllable
+    `l` delete if in R2 and preceded by l
 */
-immutable class EnglishRule5 : IStemOperation {
+class EnglishRule5 : IStemOperation {
+  immutable:
 
-  /// Instantiate the rule
-  static immutable(IStemOperation) opCall() pure {
-    return new immutable EnglishRule5();
-  }
-
-  /// Apply the rule to a word
-  string get(const string value) pure {
-    auto r1 = EnglishAlphabet.region1(value);
-    auto r2 = EnglishAlphabet.region1(r1);
-
-    if(r2.endsWith('l') && value.endsWith("ll")) {
-      return value[0..$-1];
+    /// Instantiate the rule
+    static immutable(IStemOperation) opCall() pure {
+      return new immutable EnglishRule5();
     }
 
-    if(r2.endsWith('e')) {
-      return value[0..$-1];
-    }
+    /// Apply the rule to a word
+    string get(const string value) pure {
+      auto r1 = EnglishAlphabet.region1(value);
+      auto r2 = EnglishAlphabet.region1(r1);
 
-    if(r1.endsWith('e')) {
-      string beforeE = value[0..value.lastIndexOf('e')];
-
-      if(!EnglishAlphabet.endsWithShortSylable(beforeE)) {
+      if(r2.endsWith('l') && value.endsWith("ll")) {
         return value[0..$-1];
       }
-    }
 
-    return "";
-  }
+      if(r2.endsWith('e')) {
+        return value[0..$-1];
+      }
+
+      if(r1.endsWith('e')) {
+        string beforeE = value[0..value.lastIndexOf('e')];
+
+        if(!EnglishAlphabet.endsWithShortSylable(beforeE)) {
+          return value[0..$-1];
+        }
+      }
+
+      return "";
+    }
 }
 
 /**
@@ -156,40 +159,41 @@ immutable class EnglishRule5 : IStemOperation {
 
   Search for the longest among the following suffixes, and, if found and in R1, delete if preceded by a valid li-ending.
 */
-immutable class ReplaceEnglishLiEnding : IStemOperation {
-  /// Instantiate the rule
-  static immutable(IStemOperation) opCall() pure {
-    return new immutable ReplaceEnglishLiEnding();
-  }
-
-  /// Apply the rule to a word
-  string get(const string value) pure {
-    if(value.length <= 2) {
-      return "";
+class ReplaceEnglishLiEnding : IStemOperation {
+  immutable:
+    /// Instantiate the rule
+    static immutable(IStemOperation) opCall() pure {
+      return new immutable ReplaceEnglishLiEnding();
     }
 
-    if(value.endsWith("ousli") ||
-       value.endsWith("abli") ||
-       value.endsWith("lessli") ||
-       value.endsWith("alli") ||
-       value.endsWith("fulli") ||
-       value.endsWith("bli") ||
-       value.endsWith("entli") ) {
-         return "";
+    /// Apply the rule to a word
+    string get(const string value) pure {
+      if(value.length <= 2) {
+        return "";
+      }
+
+      if(value.endsWith("ousli") ||
+        value.endsWith("abli") ||
+        value.endsWith("lessli") ||
+        value.endsWith("alli") ||
+        value.endsWith("fulli") ||
+        value.endsWith("bli") ||
+        value.endsWith("entli") ) {
+          return "";
+      }
+
+      auto r1 = EnglishAlphabet.region1(value);
+
+      if(!r1.endsWith("li")) {
+        return "";
+      }
+
+      if("cdeghkmnrt".indexOf(value[value.length - 3]) == -1) {
+        return "";
+      }
+
+      return value[0..$-2];
     }
-
-    auto r1 = EnglishAlphabet.region1(value);
-
-    if(!r1.endsWith("li")) {
-      return "";
-    }
-
-    if("cdeghkmnrt".indexOf(value[value.length - 3]) == -1) {
-      return "";
-    }
-
-    return value[0..$-2];
-  }
 }
 
 /**
@@ -198,47 +202,46 @@ immutable class ReplaceEnglishLiEnding : IStemOperation {
   '
   's
   's'
-      and remove if found. 
+      and remove if found.
 */
-immutable class RemoveEnglishPlural : IStemOperation {
-  /// Instantiate the rule
-  static immutable(IStemOperation) opCall() pure {
-    return new immutable RemoveEnglishPlural();
-  }
+class RemoveEnglishPlural : IStemOperation {
+  immutable:
+    /// Instantiate the rule
+    static immutable(IStemOperation) opCall() pure {
+      return new immutable RemoveEnglishPlural();
+    }
 
-  /// Apply the rule to a word
-  string get(const string value) pure {
-    if(value.length <= 2) {
+    /// Apply the rule to a word
+    string get(const string value) pure {
+      if(value.length <= 2) {
+        return "";
+      }
+
+      if(!value.endsWith('s')) {
+        return "";
+      }
+
+      if(value.endsWith("ss")) {
+        return "";
+      }
+
+      if(value.endsWith("us")) {
+        return "";
+      }
+
+      auto format = value.map!(a => EnglishAlphabet.isVowel(a)).array;
+
+      if(format[0..$-2].canFind(true)) {
+        return value[0..$-1];
+      }
+
       return "";
     }
-
-    if(!value.endsWith('s')) {
-      return "";
-    }
-
-    if(value.endsWith("ss")) {
-      return "";
-    }
-
-    if(value.endsWith("us")) {
-      return "";
-    }
-
-    auto format = value.map!(a => EnglishAlphabet.isVowel(a)).array;
-
-    if(format[0..$-2].canFind(true)) {
-      return value[0..$-1];
-    }
-
-    return "";
-  }
 }
 
-/// English Porter2 stemmer implementation
-class EnStemmer {
 
-  /// The stemmer operations
-  static immutable operations = [
+/// The stemmer operations
+static immutable englishOperations = [
     Or([
       [ Invariant(["sky", "news", "howe", "atlas", "cosmos", "bias", "andes"]) ], // exception 1 or
       [
@@ -337,6 +340,8 @@ class EnStemmer {
     ])
   ];
 
+/// English Porter2 stemmer implementation
+class EnStemmer {
   /// Apply the algorithm to a word
   string get(const string value) pure {
     if(value.length < 3) {
@@ -350,7 +355,7 @@ class EnStemmer {
       tmpValue = value;
     }
 
-    auto result = And(operations).get(tmpValue);
+    auto result = And(englishOperations).get(tmpValue);
 
     if(result == "") {
       return value;

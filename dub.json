@@ -4,7 +4,7 @@
 		"Bogdan Szabo"
 	],
 	"description": "A stemmer library for D programming language",
-	"copyright": "Copyright © 2018, Bogdan Szabo",
+	"copyright": "Copyright © 2018-2023, Bogdan Szabo",
 	"license": "MIT",
 	"configurations": [
 		{
@@ -12,10 +12,10 @@
 			"targetType": "library"
 		},
 		{
-			"name": "trial",
+			"name": "unittest",
 			"dependencies": {
-				"fluent-asserts": "~>0.9.0",
-				"trial:lifecycle": "~>0.6.1"
+				"fluent-asserts": "*",
+				"trial": "~>0.8.0-beta.3"
 			},
 			"sourcePaths": ["./source", "./tests"],
 			"importPaths": ["./source"]

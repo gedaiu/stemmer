@@ -1,4 +1,4 @@
-module valley.stemmer.cleaner;
+module stemmer.cleaner;
 
 import std.uni;
 import std.utf;

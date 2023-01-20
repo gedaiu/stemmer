@@ -1,4 +1,4 @@
-module valley.stemmer.stemmer;
+module stemmer.stemmer;
 
 import std.string;
 import std.conv;
@@ -55,8 +55,8 @@ struct Alphabet(string[] vowels, string[] extraLetters = []) {
     /**
       Check if the word ens in a short sylable
 
-      Define a short syllable in a word as either 
-        (a) a vowel followed by a non-vowel other than w, x or Y and preceded by a non-vowel, or * 
+      Define a short syllable in a word as either
+        (a) a vowel followed by a non-vowel other than w, x or Y and preceded by a non-vowel, or *
         (b) a vowel at the beginning of the word followed by a non-vowel.
     */
     bool endsWithShortSylable(string data) pure {
@@ -88,7 +88,7 @@ struct Alphabet(string[] vowels, string[] extraLetters = []) {
       return false;
     }
 
-    /// Return a list of words derived from `value` where the chars marked as vowels(`V`) are replaced with actual 
+    /// Return a list of words derived from `value` where the chars marked as vowels(`V`) are replaced with actual
     /// elements from the alphabet
     string[] replaceVowels(const string value) pure {
       if(!value.canFind!"a == 'V'") {
@@ -108,7 +108,7 @@ struct Alphabet(string[] vowels, string[] extraLetters = []) {
       return list;
     }
 
-    /// Return a list of words derived from `value` where the chars marked as non-vowels(`N`) are replaced with actual 
+    /// Return a list of words derived from `value` where the chars marked as non-vowels(`N`) are replaced with actual
     /// elements from the alphabet
     string[] replaceNonVowels(const string value) pure {
       if(!value.canFind!"a == 'N'") {
@@ -128,7 +128,7 @@ struct Alphabet(string[] vowels, string[] extraLetters = []) {
       return list;
     }
 
-    /// Return a list of words derived from `value` where the chars marked as any(`*`) are replaced with actual 
+    /// Return a list of words derived from `value` where the chars marked as any(`*`) are replaced with actual
     /// elements from the alphabet
     string[] replaceAny(const string value) pure {
       if(!value.canFind!"a == '*'") {
