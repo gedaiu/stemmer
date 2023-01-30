@@ -16,6 +16,18 @@ import trial.step;
 
 private alias suite = Spec!({
   describe("textCleaner", {
+    it("should replace the extended A chars", {
+      "ĀāĂăĄąȀȁȂȃǍǎǞǟ".clean.should.equal("aaaaaaaaaaaaaa");
+    });
+
+    it("should replace the extended B chars", {
+      "ƀƁƂƃƄƅ".clean.should.equal("bbbbbb");
+    });
+
+    it("should replace the extended C chars", {
+      "ĆćĈĉĊċČčƆƇƈ".clean.should.equal("ccccccccccc");
+    });
+
     it("should clean diamond bullets", {
       "♦ belisarius".clean.should.equal("belisarius");
     });

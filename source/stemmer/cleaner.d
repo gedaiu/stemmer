@@ -16,8 +16,47 @@ bool isBetweenNumberAndText(dchar a, dchar b) pure {
   return (a.isAlpha && b.isNumber) || (b.isAlpha && a.isNumber);
 }
 
+struct SpecialChar {
+  char latin;
+  string variants;
+}
+
+enum SpecialChar[] SpecialCharList = [
+  SpecialChar('a', "ĀāĂăĄąȦȧǍǎǞǟǠǡǢǣȀȁȂȃǺǻǼǽȺɅȡ"),
+  SpecialChar('b', "ƀƁƂƃƄƅɃ"),
+  SpecialChar('c', "ĆćĈĉĊċČčƆƇƈȻȼ"),
+  SpecialChar('d', "ĎďĐđƉƊƋƌƍǄǅǆǱǲǳȸ"),
+  SpecialChar('e', "ĒēĔĕĖėĘęĚěƎƏƐƷƸƹƺƻƼƽƾɆɇȄȅȆȇǝǮǯȜȝȨȩ"),
+  SpecialChar('f', "Ƒƒ"),
+  SpecialChar('g', "ĜĝĞğĠġĢģƓƔǤǥǦǧǴǵɁɂ"),
+  SpecialChar('h', "ĤĥĦħƕǶ"),
+  SpecialChar('i', "ĨĩĪīĬĭĮįİıƗǏȈȉȊȋǐǀǁǂǃ"),
+  SpecialChar('j', "ĲĳĴĵƖƚǇǈǉǊǋǌɈɉǰȷ"),
+  SpecialChar('k', "ĶķĸƘƙǨǩ"),
+  SpecialChar('l', "ĹĺĻļĽľĿŀŁłƛȽȴȶ"),
+  SpecialChar('w', "Ɯ"),
+  SpecialChar('n', "ŃńŅņŇňŉŊŋƝƞǸǹȠȵ"),
+  SpecialChar('o', "ŌōŎŏŐőŒœƟƠơƢƣǑǒǪǫǬǭȪȫȬȭȮȯȌȍȎȏȰȱǾǿȣ"),
+  SpecialChar('p', "ƤƥƿǷ"),
+  SpecialChar('q', "Ɋɋȹ"),
+  SpecialChar('r', "ŔŕŖŗŘřƦɌȐȑȒȓɌɍ"),
+  SpecialChar('s', "ŚśŜŝŞşŠšƩƪȘșȿ"),
+  SpecialChar('t', "ŢţŤťŦŧƫƬƭƮȚțȾ"),
+  SpecialChar('u', "ŨũŪūŬŭŮůŰűŲųƯưƱƲǓǔǕǖǗǘǙǚǛǜɄȔȕȖȗ"),
+  SpecialChar('w', "Ŵŵ"),
+  SpecialChar('y', "ŶŷŸƳƴȲȳɎɏ"),
+  SpecialChar('z', "ŹźŻżŽžſƵƶȤȥɀ"),
+];
+
 /// Removes special chars and prepares the text for stemming
 string clean(string data) pure {
+
+  static foreach (list; SpecialCharList) {
+    static foreach (ch; list.variants.byDchar) {
+      data = data.replace(ch, list.latin);
+    }
+  }
+
   enum dchar space = ' ';
 
   auto tmp = data.byDchar
