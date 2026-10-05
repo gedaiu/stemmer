@@ -15,7 +15,7 @@
 			"name": "unittest",
 			"dependencies": {
 				"fluent-asserts": "*",
-				"trial": "1.0.0-beta.1"
+				"trial": "~>1.1.0"
 			},
 			"sourcePaths": ["./source", "./tests"],
 			"importPaths": ["./source"]
